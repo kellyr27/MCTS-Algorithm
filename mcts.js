@@ -135,9 +135,9 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
 const initialState = [
     ['-', '-', '-', '-', '-', '-', '-'],
     ['-', '-', '-', '-', '-', '-', 'X'],
-    ['-', '-', '-', '-', '-', '-', 'X'],
-    ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', 'X'],
+    ['-', '-', '-', 'X', 'X', 'O', 'X'],
+    ['-', '-', '-', '-', 'O', '-', '-'],
+    ['-', '-', '-', 'X', '-', 'X', 'X'],
     ['-', '-', 'O', '-', '-', '-', 'X']
 ]
 
@@ -252,18 +252,52 @@ function c4CheckTerminal(state, playerTurn, previousStates) {
     }
 
     // Search diagonal down-right
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 4; j++) {
+            if ((state[i+0][j+0] == state[i+1][j+1]) && (state[i+2][j+2] == state[i+3][j+3]) && (state[i+1][j+1] == state[i+3][j+3])) {
+                if (state[i+0][j+0] != '-') {
+                    return true
+                } 
+            }
+        }
+    }
 
     // Search diagonal up-right
+    for (let i = 0; i < 3; i++) {
+        for (let j = 3; j < 7; j++) {
+            if ((state[i+0][j-0] == state[i+1][j-1]) && (state[i+2][j-2] == state[i+3][j-3]) && (state[i+1][j-1] == state[i+3][j-3])) {
+                if (state[i+0][j-0] != '-') {
+                    return true
+                } 
+            }
+        }
+    }
 
     // Check if full
+    let isFull = true
+    for (let i = 0; i < 6; i++) {
+        for (let j = 0; j < 7; j++) {
+            if (state[i][j] == '-') {
+                isFull = false
+                break
+            }
+        }
 
+        if (!isFull) {
+            break
+        } 
+    }
+
+    if (isFull) {
+        return true
+    }
 
     return false
 }
 
 
 // // getNextState, previousStates, checkTerminal
-// c4PrintState(initialState)
+c4PrintState(initialState)
 // console.log(c4getPossibleActions(initialState))
 
 // const newState = c4GetNextState(initialState, 1, { row: 5, col: 3 })
