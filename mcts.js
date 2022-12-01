@@ -10,13 +10,13 @@
  * Stores game State information
  */
 class Node {
-    contructor (state, playerTurn, action) {
+    contructor(state, playerTurn, action) {
         // Action taken on previous state to attain this state
         this.action = action
         this.state = state
         this.playerTurn = playerTurn
         this.children = []
-        
+
         // For calculating the UCB Score
         this.n = 0
         this.s = 0
@@ -28,11 +28,11 @@ class Node {
     }
 
     // Create list of children from list of possible actions
-    createChildren (getPossibleActions, getNextState) {
+    createChildren(getPossibleActions, getNextState) {
         const possibleActions = getPossibleActions(this.state, this.playerTurn)
 
         for (const action of possibleActions) {
-            this.children.push(new Node(getNextState(this.state, this.playerTurn, action), this.playerTurn*-1, action))
+            this.children.push(new Node(getNextState(this.state, this.playerTurn, action), this.playerTurn * -1, action))
         }
 
         // Choose random possible State and return for the Expansion Phase
@@ -43,7 +43,7 @@ class Node {
 
 // Calculates the UCB Score for a given Node
 function ucbScore(n, s, c, nParent) {
-    return (s / n) + c * Math.sqrt((2 * Math.log(nParent) ) / n)
+    return (s / n) + c * Math.sqrt((2 * Math.log(nParent)) / n)
 }
 
 function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActions, getNextState, previousStates, checkTerminal, checkGain) {
@@ -51,7 +51,7 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
     const root = new Node(initialState, playerTurn)
 
     for (let i = 0; i < numIterations; i++) {
-        
+
         /**
          * SELECTION PHASE
          */
@@ -61,7 +61,7 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
 
         // Find the node with the highest UCB Score
         while (!currentNode.isLeaf()) {
-            
+
             let highestUCBScore = 0
             let highestUCBScoreChildIndex = -1
 
@@ -75,7 +75,7 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
                     highestUCBScoreChildIndex = index
                     break
                 }
-                
+
                 /**
                  * If the UCB Score is currently the highest, save the Child index position and the UCB score
                  */
@@ -95,9 +95,9 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
          * EXPANSION PHASE
          */
         // Create children for the node
-        const selectedExpansionNode = nodeList[nodeList.length-1].createChildren(getPossibleActions, getNextState)
+        const selectedExpansionNode = nodeList[nodeList.length - 1].createChildren(getPossibleActions, getNextState)
         nodeList.push(selectedExpansionNode)
-        
+
 
         /**
          * SIMULATION PHASE
@@ -111,7 +111,7 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
 
             // Choose a completely random action and create next State from this action
             const randomActionIndex = Math.floor(Math.random() * possibleActions.length)
-            currentNode = new Node(getNextState(currentNode.state, currentNode.playerTurn, possibleActions[randomActionIndex]), this.playerTurn*-1, possibleActions[randomActionIndex])
+            currentNode = new Node(getNextState(currentNode.state, currentNode.playerTurn, possibleActions[randomActionIndex]), this.playerTurn * -1, possibleActions[randomActionIndex])
         }
 
         /**
@@ -133,12 +133,12 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
  */
 
 const initialState = [
-    ['-','-','-','-','-','-','-'],
-    ['-','-','-','-','-','-','X'],
-    ['-','-','-','-','-','-','X'],
-    ['-','-','-','-','-','-','X'],
-    ['-','-','-','-','-','-','X'],
-    ['-','-','O','-','-','-','X']
+    ['-', '-', '-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-', '-', 'X'],
+    ['-', '-', '-', '-', '-', '-', 'X'],
+    ['-', '-', '-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-', '-', 'X'],
+    ['-', '-', 'O', '-', '-', '-', 'X']
 ]
 
 function c4PrintState(state) {
@@ -175,11 +175,100 @@ function c4GetNextState(state, playerTurn, action) {
     return state
 }
 
-// getNextState, previousStates, checkTerminal
-c4PrintState(initialState)
-console.log(c4getPossibleActions(initialState))
+function c4CheckTerminal(state, playerTurn, previousStates) {
+    // Search rows
+    for (let i = 0; i < 6; i++) {
+        let count = 0
+        let curSymbol = '-'
+        for (let j = 0; j < 7; j++) {
 
-const newState = c4GetNextState(initialState, 1, {row:5, col:3})
+            if (state[i][j] == 'X') {
+                if (curSymbol == 'X') {
+                    count += 1
+                    if (count == 4) {
+                        return true
+                    }
+                }
+                else {
+                    curSymbol = 'X'
+                    count = 1
+                }
+            }
+            else if (state[i][j] == 'O') {
+                if (curSymbol == 'O') {
+                    count += 1
+                    if (count == 4) {
+                        return true
+                    }
+                }
+                else {
+                    curSymbol = 'O'
+                    count = 1
+                }
+            }
+            else {
+                count = 0
+                curSymbol = '-'
+            }
 
-c4PrintState(newState)
-console.log(c4getPossibleActions(newState))
+        }
+    }
+
+
+    // Search columns
+    for (let j = 0; j < 7; j++) {
+        let count = 0
+        let curSymbol = '-'
+        for (let i = 0; i < 6; i++) {
+            if (state[i][j] == 'X') {
+                if (curSymbol == 'X') {
+                    count += 1
+                    if (count == 4) {
+                        return true
+                    }
+                }
+                else {
+                    curSymbol = 'X'
+                    count = 1
+                }
+            }
+            else if (state[i][j] == 'O') {
+                if (curSymbol == 'O') {
+                    count += 1
+                    if (count == 4) {
+                        return true
+                    }
+                }
+                else {
+                    curSymbol = 'O'
+                    count = 1
+                }
+            }
+            else {
+                count = 0
+                curSymbol = '-'
+            }
+        }
+    }
+
+    // Search diagonal down-right
+
+    // Search diagonal up-right
+
+    // Check if full
+
+
+    return false
+}
+
+
+// // getNextState, previousStates, checkTerminal
+// c4PrintState(initialState)
+// console.log(c4getPossibleActions(initialState))
+
+// const newState = c4GetNextState(initialState, 1, { row: 5, col: 3 })
+
+// c4PrintState(newState)
+// console.log(c4getPossibleActions(newState))
+
+console.log(c4CheckTerminal(initialState))
