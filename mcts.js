@@ -2,8 +2,13 @@
  * Monte Carlo Tree Search Algorithm
  * Author: Kelly Ristovsky
  * Date: Nov-22
+ * Purpose: This code is designed to be adaptable for any game.
  */
 
+
+/**
+ * Stores game State information
+ */
 class Node {
     contructor (state, playerTurn, action) {
         // Action taken on previous state to attain this state
@@ -41,7 +46,7 @@ function ucbScore(n, s, c, nParent) {
     return (s / n) + c * Math.sqrt((2 * Math.log(nParent) ) / n)
 }
 
-function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActions, getNextState) {
+function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActions, getNextState, previousStates, checkTerminal, checkGain) {
     // First initialize the root node
     const root = new Node(initialState, playerTurn)
 
@@ -90,13 +95,35 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
          * EXPANSION PHASE
          */
         // Create children for the node
-        const selectedExpansionNode = nodeList[nodeList.length-1].createChildren()
+        const selectedExpansionNode = nodeList[nodeList.length-1].createChildren(getPossibleActions, getNextState)
         nodeList.push(selectedExpansionNode)
         
+
         /**
          * SIMULATION PHASE
          */
-        
+        currentNode = selectedExpansionNode
+        // Check if the current State is terminal, else keep simulating the game
+        while (!checkTerminal(currentNode.state, currentNode.playerTurn, previousStates)) {
+
+            // Get a list of possible actions from the current State
+            const possibleActions = getPossibleActions(currentNode.state, currentNode.playerTurn)
+
+            // Choose a completely random action and create next State from this action
+            const randomActionIndex = Math.floor(Math.random() * possibleActions.length)
+            currentNode = new Node(getNextState(currentNode.state, currentNode.playerTurn, possibleActions[randomActionIndex]), this.playerTurn*-1, possibleActions[randomActionIndex])
+        }
+
+        /**
+         * BACKPROPAGATION PHASE
+         */
+        // Get the Gain value from the SIMULATION PHASE
+        const gain = checkGain(currentNode.state, currentNode.playerTurn, previousStates)
+
+        // For every node from the root to the selected node (from the SELECTION PHASE), update n & s values
+        for (const node of nodeList) {
+            
+        }
     }
 
 }
