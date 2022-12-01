@@ -132,15 +132,6 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
  * CONNECT 4 GAME
  */
 
-const initialState = [
-    ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', 'X'],
-    ['-', '-', '-', 'X', 'X', 'O', 'X'],
-    ['-', '-', '-', '-', 'O', '-', '-'],
-    ['-', '-', '-', 'X', '-', 'X', 'X'],
-    ['-', '-', 'O', '-', '-', '-', 'X']
-]
-
 function c4PrintState(state) {
     for (let i = 0; i < 6; i++) {
         console.log(`${state[i][0]} ${state[i][1]} ${state[i][2]} ${state[i][3]} ${state[i][4]} ${state[i][5]} ${state[i][6]}`)
@@ -254,10 +245,10 @@ function c4CheckTerminal(state, playerTurn, previousStates) {
     // Search diagonal down-right
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 4; j++) {
-            if ((state[i+0][j+0] == state[i+1][j+1]) && (state[i+2][j+2] == state[i+3][j+3]) && (state[i+1][j+1] == state[i+3][j+3])) {
-                if (state[i+0][j+0] != '-') {
+            if ((state[i + 0][j + 0] == state[i + 1][j + 1]) && (state[i + 2][j + 2] == state[i + 3][j + 3]) && (state[i + 1][j + 1] == state[i + 3][j + 3])) {
+                if (state[i + 0][j + 0] != '-') {
                     return true
-                } 
+                }
             }
         }
     }
@@ -265,10 +256,10 @@ function c4CheckTerminal(state, playerTurn, previousStates) {
     // Search diagonal up-right
     for (let i = 0; i < 3; i++) {
         for (let j = 3; j < 7; j++) {
-            if ((state[i+0][j-0] == state[i+1][j-1]) && (state[i+2][j-2] == state[i+3][j-3]) && (state[i+1][j-1] == state[i+3][j-3])) {
-                if (state[i+0][j-0] != '-') {
+            if ((state[i + 0][j - 0] == state[i + 1][j - 1]) && (state[i + 2][j - 2] == state[i + 3][j - 3]) && (state[i + 1][j - 1] == state[i + 3][j - 3])) {
+                if (state[i + 0][j - 0] != '-') {
                     return true
-                } 
+                }
             }
         }
     }
@@ -285,7 +276,7 @@ function c4CheckTerminal(state, playerTurn, previousStates) {
 
         if (!isFull) {
             break
-        } 
+        }
     }
 
     if (isFull) {
@@ -295,8 +286,171 @@ function c4CheckTerminal(state, playerTurn, previousStates) {
     return false
 }
 
+function c4CheckGain(state, playerTurn, previousStates) {
+    // Search rows
+    for (let i = 0; i < 6; i++) {
+        let count = 0
+        let curSymbol = '-'
+        for (let j = 0; j < 7; j++) {
 
-// // getNextState, previousStates, checkTerminal
+            if (state[i][j] == 'X') {
+                if (curSymbol == 'X') {
+                    count += 1
+                    if (count == 4) {
+                        if (playerTurn == 1) {
+                            return 1
+                        }
+                        else {
+                            return -1
+                        }
+                    }
+                }
+                else {
+                    curSymbol = 'X'
+                    count = 1
+                }
+            }
+            else if (state[i][j] == 'O') {
+                if (curSymbol == 'O') {
+                    count += 1
+                    if (count == 4) {
+                        if (playerTurn == -1) {
+                            return 1
+                        }
+                        else {
+                            return -1
+                        }
+                    }
+                }
+                else {
+                    curSymbol = 'O'
+                    count = 1
+                }
+            }
+            else {
+                count = 0
+                curSymbol = '-'
+            }
+
+        }
+    }
+
+
+    // Search columns
+    for (let j = 0; j < 7; j++) {
+        let count = 0
+        let curSymbol = '-'
+        for (let i = 0; i < 6; i++) {
+            if (state[i][j] == 'X') {
+                if (curSymbol == 'X') {
+                    count += 1
+                    if (count == 4) {
+                        if (playerTurn == 1) {
+                            return 1
+                        }
+                        else {
+                            return -1
+                        }
+                    }
+                }
+                else {
+                    curSymbol = 'X'
+                    count = 1
+                }
+            }
+            else if (state[i][j] == 'O') {
+                if (curSymbol == 'O') {
+                    count += 1
+                    if (count == 4) {
+                        if (playerTurn == -1) {
+                            return 1
+                        }
+                        else {
+                            return -1
+                        }
+                    }
+                }
+                else {
+                    curSymbol = 'O'
+                    count = 1
+                }
+            }
+            else {
+                count = 0
+                curSymbol = '-'
+            }
+        }
+    }
+
+    // Search diagonal down-right
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 4; j++) {
+            if ((state[i + 0][j + 0] == state[i + 1][j + 1]) && (state[i + 2][j + 2] == state[i + 3][j + 3]) && (state[i + 1][j + 1] == state[i + 3][j + 3])) {
+                if (state[i + 0][j + 0] != '-') {
+                    if ((playerTurn == 1) && (state[i + 0][j + 0] == 'X')) {
+                        return 1
+                    }
+                    else if ((playerTurn == -1) && (state[i + 0][j + 0] == 'O')) {
+                        return 1
+                    }
+                    else {
+                        return -1
+                    }
+                }
+            }
+        }
+    }
+
+    // Search diagonal up-right
+    for (let i = 0; i < 3; i++) {
+        for (let j = 3; j < 7; j++) {
+            if ((state[i + 0][j - 0] == state[i + 1][j - 1]) && (state[i + 2][j - 2] == state[i + 3][j - 3]) && (state[i + 1][j - 1] == state[i + 3][j - 3])) {
+                if (state[i + 0][j - 0] != '-') {
+                    if ((playerTurn == 1) && (state[i + 0][j - 0] == 'X')) {
+                        return 1
+                    }
+                    else if ((playerTurn == -1) && (state[i + 0][j - 0] == 'O')) {
+                        return 1
+                    }
+                    else {
+                        return -1
+                    }
+                }
+            }
+        }
+    }
+
+    // Check if full
+    let isFull = true
+    for (let i = 0; i < 6; i++) {
+        for (let j = 0; j < 7; j++) {
+            if (state[i][j] == '-') {
+                isFull = false
+                break
+            }
+        }
+
+        if (!isFull) {
+            break
+        }
+    }
+
+    if (isFull) {
+        return 0
+    }
+}
+
+
+const initialState = [
+    ['-', '-', '-', '-', '-', '-', '-'],
+    ['-', '-', '-', '-', '-', '-', 'X'],
+    ['-', '-', '-', 'X', 'X', 'O', 'X'],
+    ['-', '-', '-', 'X', '-', '-', '-'],
+    ['-', '-', '-', 'X', '-', 'X', 'X'],
+    ['O', 'O', 'O', '-', '-', '-', 'X']
+]
+
+// // getNextState, previousStates,
 c4PrintState(initialState)
 // console.log(c4getPossibleActions(initialState))
 
@@ -306,3 +460,4 @@ c4PrintState(initialState)
 // console.log(c4getPossibleActions(newState))
 
 console.log(c4CheckTerminal(initialState))
+console.log(c4CheckGain(initialState,1))
