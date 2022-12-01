@@ -122,8 +122,64 @@ function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActio
 
         // For every node from the root to the selected node (from the SELECTION PHASE), update n & s values
         for (const node of nodeList) {
-            
+            node.n += 1
+            node.s += gain
         }
     }
-
 }
+
+/**
+ * CONNECT 4 GAME
+ */
+
+const initialState = [
+    ['-','-','-','-','-','-','-'],
+    ['-','-','-','-','-','-','X'],
+    ['-','-','-','-','-','-','X'],
+    ['-','-','-','-','-','-','X'],
+    ['-','-','-','-','-','-','X'],
+    ['-','-','O','-','-','-','X']
+]
+
+function c4PrintState(state) {
+    for (let i = 0; i < 6; i++) {
+        console.log(`${state[i][0]} ${state[i][1]} ${state[i][2]} ${state[i][3]} ${state[i][4]} ${state[i][5]} ${state[i][6]}`)
+    }
+}
+
+
+function c4getPossibleActions(state, playerTurn) {
+    const possibleActions = []
+    for (let i = 0; i < 7; i++) {
+        for (let j = 5; j >= 0; j--) {
+            if (state[j][i] == '-') {
+                possibleActions.push({
+                    row: j,
+                    col: i
+                })
+                break
+            }
+        }
+    }
+    return possibleActions
+}
+
+function c4GetNextState(state, playerTurn, action) {
+
+    if (playerTurn == 1) {
+        state[action.row][action.col] = 'X'
+    }
+    if (playerTurn == -1) {
+        state[action.row][action.col] = 'O'
+    }
+    return state
+}
+
+// getNextState, previousStates, checkTerminal
+c4PrintState(initialState)
+console.log(c4getPossibleActions(initialState))
+
+const newState = c4GetNextState(initialState, 1, {row:5, col:3})
+
+c4PrintState(newState)
+console.log(c4getPossibleActions(newState))
