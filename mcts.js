@@ -21,6 +21,19 @@ class Node {
     isLeaf() {
         return this.children.length() == 0
     }
+
+    // Create list of children from list of possible actions
+    createChildren (getPossibleActions, getNextState) {
+        const possibleActions = getPossibleActions(this.state, this.playerTurn)
+
+        for (const action of possibleActions) {
+            this.children.push(new Node(getNextState(this.state, this.playerTurn, action), this.playerTurn*-1, action))
+        }
+
+        // Choose random possible State and return for the Expansion Phase
+        const randomChildIndex = Math.floor(Math.random() * this.children.length)
+        return this.children[randomChildIndex]
+    }
 }
 
 // Calculates the UCB Score for a given Node
@@ -28,7 +41,7 @@ function ucbScore(n, s, c, nParent) {
     return (s / n) + c * Math.sqrt((2 * Math.log(nParent) ) / n)
 }
 
-function mctsAlgorithm(initialState, playerTurn, numIterations) {
+function mctsAlgorithm(initialState, playerTurn, numIterations, getPossibleActions, getNextState) {
     // First initialize the root node
     const root = new Node(initialState, playerTurn)
 
@@ -76,6 +89,14 @@ function mctsAlgorithm(initialState, playerTurn, numIterations) {
         /**
          * EXPANSION PHASE
          */
+        // Create children for the node
+        const selectedExpansionNode = nodeList[nodeList.length-1].createChildren()
+        nodeList.push(selectedExpansionNode)
+        
+        /**
+         * SIMULATION PHASE
+         */
+        
     }
 
 }
