@@ -5,12 +5,13 @@
  * Purpose: This code is designed to be adaptable for any game.
  */
 
+const explorationFactor = 0.7
 
 /**
  * Stores game State information
  */
 class Node {
-    constructor (state, playerTurn, action) {
+    constructor(state, playerTurn, action) {
 
         // Action taken on previous state to attain this state
         this.action = action
@@ -32,6 +33,8 @@ class Node {
     createChildren(getPossibleActions, getNextState) {
 
         const possibleActions = getPossibleActions(this.state, this.playerTurn)
+
+
         for (const action of possibleActions) {
             this.children.push(new Node(getNextState(this.state, this.playerTurn, action), this.playerTurn * -1, action))
         }
@@ -52,14 +55,14 @@ function mctsAlgorithm(initialState, initialPlayerTurn, numIterations, getPossib
     let root = new Node(initialState, initialPlayerTurn, false)
 
     for (let i = 0; i < numIterations; i++) {
-        console.log(`Iteration number ${i}`)
+        // console.log(`Iteration number ${i}`)
         /**
          * SELECTION PHASE
          */
-        console.log('SELECTION PHASE')
         let currentNode = root
         // List of nodes selected for backpropagation
         const nodeList = [currentNode]
+
         // Find the node with the highest UCB Score
         while (!currentNode.isLeaf()) {
             let highestUCBScore = 0
@@ -79,8 +82,9 @@ function mctsAlgorithm(initialState, initialPlayerTurn, numIterations, getPossib
                 /**
                  * If the UCB Score is currently the highest, save the Child index position and the UCB score
                  */
-                const currentUCBScore = ucbScore(child.n, child.s, 0.8, currentNode.n)
-                if (currentUCBScore > highestUCBScore) {
+                const currentUCBScore = ucbScore(child.n, child.s, explorationFactor, currentNode.n)
+
+                if (currentUCBScore >= highestUCBScore) {
                     highestUCBScore = currentUCBScore
                     highestUCBScoreChildIndex = index
                 }
@@ -94,20 +98,34 @@ function mctsAlgorithm(initialState, initialPlayerTurn, numIterations, getPossib
         /**
          * EXPANSION PHASE
          */
-        console.log('EXPANSION PHASE')
         // Create children for the node
         const selectedExpansionNode = nodeList[nodeList.length - 1].createChildren(getPossibleActions, getNextState)
-        nodeList.push(selectedExpansionNode)
+        if (selectedExpansionNode) {
+            nodeList.push(selectedExpansionNode)
+        }
+
+        /**
+         * If the Node has no children, then the terminal state is reached,
+         * We can skip the simulation phase and go to the BACKPROPAGATION PHASE
+         */
+        else {
+            const gain = checkGain(nodeList[nodeList.length - 1].state, root.playerTurn, previousStates)
+
+            // For every node from the root to the selected node (from the SELECTION PHASE), update n & s values
+            for (const node of nodeList) {
+                node.n += 1
+                node.s += gain
+            }
+            continue
+        }
 
 
         /**
          * SIMULATION PHASE
          */
-        console.log('SIMULATION PHASE')
         currentNode = selectedExpansionNode
         // Check if the current State is terminal, else keep simulating the game
         while (!checkTerminal(currentNode.state, currentNode.playerTurn, previousStates)) {
-
             // Get a list of possible actions from the current State
             const possibleActions = getPossibleActions(currentNode.state, currentNode.playerTurn)
 
@@ -116,15 +134,14 @@ function mctsAlgorithm(initialState, initialPlayerTurn, numIterations, getPossib
 
             currentNode = new Node(getNextState(currentNode.state, currentNode.playerTurn, possibleActions[randomActionIndex]), currentNode.playerTurn * -1, possibleActions[randomActionIndex])
         }
-        c4PrintState(currentNode.state)
 
         /**
          * BACKPROPAGATION PHASE
          */
-        console.log('BACKPROP PHASE')
         // Get the Gain value from the SIMULATION PHASE
-        const gain = checkGain(currentNode.state, selectedExpansionNode.playerTurn, previousStates)
-        console.log('Gain is ', gain)
+        const gain = checkGain(currentNode.state, root.playerTurn, previousStates)
+
+
         // For every node from the root to the selected node (from the SELECTION PHASE), update n & s values
         for (const node of nodeList) {
             node.n += 1
@@ -132,12 +149,18 @@ function mctsAlgorithm(initialState, initialPlayerTurn, numIterations, getPossib
         }
     }
 
-    // Now select the node with the highest UCB Score from the Root
-    console.log('-------MTCS--------')
+    // Now select the node with the highest n value from the Root children
+    let currentHighestN = 0
+    let currentBestAction
     for (const child of root.children) {
-        // console.log(`Action is ${child.action}`)
-        // console.log(`UCB Score is ${child.n, child.s, 0.8, root.n}\n`)
+
+        if (currentHighestN < child.n) {
+            currentHighestN = child.n
+            currentBestAction = child.action
+        }
     }
+
+    return currentBestAction
 }
 
 /**
@@ -313,7 +336,7 @@ function c4CheckGain(state, playerTurn, previousStates) {
                             return 1
                         }
                         else {
-                            return -1
+                            return 0
                         }
                     }
                 }
@@ -330,7 +353,7 @@ function c4CheckGain(state, playerTurn, previousStates) {
                             return 1
                         }
                         else {
-                            return -1
+                            return 0
                         }
                     }
                 }
@@ -361,7 +384,7 @@ function c4CheckGain(state, playerTurn, previousStates) {
                             return 1
                         }
                         else {
-                            return -1
+                            return 0
                         }
                     }
                 }
@@ -378,7 +401,7 @@ function c4CheckGain(state, playerTurn, previousStates) {
                             return 1
                         }
                         else {
-                            return -1
+                            return 0
                         }
                     }
                 }
@@ -406,7 +429,7 @@ function c4CheckGain(state, playerTurn, previousStates) {
                         return 1
                     }
                     else {
-                        return -1
+                        return 0
                     }
                 }
             }
@@ -425,7 +448,7 @@ function c4CheckGain(state, playerTurn, previousStates) {
                         return 1
                     }
                     else {
-                        return -1
+                        return 0
                     }
                 }
             }
@@ -448,12 +471,12 @@ function c4CheckGain(state, playerTurn, previousStates) {
     }
 
     if (isFull) {
-        return 0
+        return 0.5
     }
 }
 
 function c4ChooseRandomAction(actions) {
-    const randomIndex = Math.floor(Math.random() * actions.length) 
+    const randomIndex = Math.floor(Math.random() * actions.length)
     return actions[randomIndex]
 }
 
@@ -466,27 +489,68 @@ const initialState = [
     ['-', '-', '-', '-', '-', '-', '-'],
     ['-', '-', '-', '-', '-', '-', '-']
 ]
+// const initialState = [
+//     ['-', '-', 'X', 'O', '-', '-', 'X'],
+//     ['-', '-', 'O', 'O', '-', '-', 'X'],
+//     ['X', '-', 'O', 'X', '-', 'O', 'X'],
+//     ['O', '-', 'O', 'O', '-', 'O', 'O'],
+//     ['X', '-', 'X', 'X', 'O', 'O', 'X'],
+//     ['X', 'X', 'X', 'O', 'O', 'X', 'X']
+// ]
+
 const prompt = require("prompt-sync")({ sigint: true })
 
-// Play game
-let currentState = initialState
-c4PrintState(currentState)
-while (!c4CheckTerminal(currentState)) {
-    // Player 1
-    let moveInput = prompt('What is your move? (row col): ')
-    currentState = c4GetNextState(currentState, 1, {
-        row: parseInt(moveInput[0]),
-        col: parseInt(moveInput[2])
-    })
 
-    c4PrintState(currentState)
+let p1Win = 0
+let p2Win = 0
+let draw = 0
 
-    // Player 2 - random AI
-    mctsAlgorithm(currentState, -1, 200, c4getPossibleActions, c4GetNextState, false, c4CheckTerminal, c4CheckGain)
-    const choosenAction = c4ChooseRandomAction(c4getPossibleActions(currentState))
-    currentState = c4GetNextState(currentState, -1, choosenAction)
+for (let g = 0; g < 1000; g++) {
+
+    let currentState = initialState
+
+    while (true) {
+
+        // Player 1 - Random AI
+        const choosenActionP1 = c4ChooseRandomAction(c4getPossibleActions(currentState))
+        currentState = c4GetNextState(currentState, 1, choosenActionP1)
+
+        if (c4CheckTerminal(currentState)) {
+            // console.log('Player 1 end')
+            // c4PrintState(currentState)
+            if (c4CheckGain(currentState, 1) == 1) {
+                p1Win += 1
+            }
+            else if (c4CheckGain(currentState, 1) == 0) {
+                p2Win += 1
+            }
+            else {
+                draw += 1
+            }
+            break
+        }
+
+        // Player 2 - random AI
+        const choosenActionP2 = mctsAlgorithm(currentState, -1, 1000, c4getPossibleActions, c4GetNextState, false, c4CheckTerminal, c4CheckGain)
+        currentState = c4GetNextState(currentState, -1, choosenActionP2)
 
 
-    c4PrintState(currentState)
+        if (c4CheckTerminal(currentState)) {
+            // console.log('Player 2 end')
+            // c4PrintState(currentState)
+            if (c4CheckGain(currentState, -1) == 1) {
+                p2Win += 1
+            }
+            else if (c4CheckGain(currentState, -1) == 0) {
+                p1Win += 1
+            }
+            else {
+                draw += 1
+            }
+            break
+        }
+    }
 }
+
+console.log(`${p1Win}  ${p2Win}  ${draw}`)
 
