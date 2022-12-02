@@ -2,11 +2,10 @@
  * Connect 4 Game
  * Author: Kelly Ristovsky
  * Date: Nov-22
- * Purpose: Game designed to be used for testing the effectiveness of the MCTS.
- * Notes:
- *      - Two player game, playerTurn is either:
- *          1       'X'
- *          -1      'O'
+ * Purpose: - Game designed to be used for testing the effectiveness of the MCTS.
+ *          - Two player game, playerTurn is either:
+ *                  1       'X'
+ *                  -1      'O'
  */
 
 /**

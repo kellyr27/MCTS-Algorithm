@@ -2,7 +2,7 @@
  * Monte Carlo Tree Search Algorithm
  * Author: Kelly Ristovsky
  * Date: Nov-22
- * Purpose: This code is designed to be adaptable for any game.
+ * Purpose: - This code is designed to be adaptable for any game.
  */
 
 /**
