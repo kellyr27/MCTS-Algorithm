@@ -512,7 +512,9 @@ for (let g = 0; g < 1000; g++) {
     while (true) {
 
         // Player 1 - Random AI
-        const choosenActionP1 = c4ChooseRandomAction(c4getPossibleActions(currentState))
+        // const choosenActionP1 = c4ChooseRandomAction(c4getPossibleActions(currentState))
+        const choosenActionP1 = mctsAlgorithm(currentState, 1, 1, c4getPossibleActions, c4GetNextState, false, c4CheckTerminal, c4CheckGain)
+
         currentState = c4GetNextState(currentState, 1, choosenActionP1)
 
         if (c4CheckTerminal(currentState)) {
@@ -531,7 +533,7 @@ for (let g = 0; g < 1000; g++) {
         }
 
         // Player 2 - random AI
-        const choosenActionP2 = mctsAlgorithm(currentState, -1, 1000, c4getPossibleActions, c4GetNextState, false, c4CheckTerminal, c4CheckGain)
+        const choosenActionP2 = mctsAlgorithm(currentState, -1, 1, c4getPossibleActions, c4GetNextState, false, c4CheckTerminal, c4CheckGain)
         currentState = c4GetNextState(currentState, -1, choosenActionP2)
 
 
