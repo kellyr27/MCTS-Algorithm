@@ -5,12 +5,16 @@
  * Purpose: This code is designed to be adaptable for any game.
  */
 
+/**
+ * CONSTANTS
+ */
 const explorationFactor = 0.7
 
 /**
- * Stores game State information
+ * Stores game State information for the Search Tree
  */
 class Node {
+
     constructor(state, playerTurn, action) {
 
         // Action taken on previous state to attain this state
@@ -45,17 +49,37 @@ class Node {
     }
 }
 
-// Calculates the UCB Score for a given Node
+/**
+ * Returns the UCB Score for a given Node
+ * @param {Number} n 
+ * @param {Number} s 
+ * @param {Number} c 
+ * @param {Number} nParent 
+ * @returns {Number}
+ */
 function ucbScore(n, s, c, nParent) {
     return (s / n) + c * Math.sqrt((2 * Math.log(nParent)) / n)
 }
 
+/**
+ * Returns the best action choosen from the MCTS
+ * @param {Array} initialState 
+ * @param {Number} initialPlayerTurn 
+ * @param {Number} numIterations 
+ * @param {Function} getPossibleActions 
+ * @param {Function} getNextState 
+ * @param {Array} previousStates 
+ * @param {Function} checkTerminal 
+ * @param {Function} checkGain 
+ * @returns {Array}
+ */
 function mctsAlgorithm(initialState, initialPlayerTurn, numIterations, getPossibleActions, getNextState, previousStates, checkTerminal, checkGain) {
+    
     // First initialize the root node
     let root = new Node(initialState, initialPlayerTurn, false)
 
     for (let i = 0; i < numIterations; i++) {
-        // console.log(`Iteration number ${i}`)
+
         /**
          * SELECTION PHASE
          */
@@ -164,395 +188,15 @@ function mctsAlgorithm(initialState, initialPlayerTurn, numIterations, getPossib
 }
 
 /**
- * CONNECT 4 GAME
+ * Chooses a random action from a given array. Used in testing for an Random AI
+ * @param {Array} actions 
+ * @returns 
  */
-
-function c4PrintState(state) {
-    for (let i = 0; i < 6; i++) {
-        console.log(`${state[i][0]} ${state[i][1]} ${state[i][2]} ${state[i][3]} ${state[i][4]} ${state[i][5]} ${state[i][6]}`)
-    }
-    console.log('\n')
-}
-
-function c4getPossibleActions(state, playerTurn) {
-    const possibleActions = []
-    for (let i = 0; i < 7; i++) {
-        for (let j = 5; j >= 0; j--) {
-            if (state[j][i] == '-') {
-                possibleActions.push({
-                    row: j,
-                    col: i
-                })
-                break
-            }
-        }
-    }
-    return possibleActions
-}
-
-function c4GetNextState(state, playerTurn, action) {
-    let tempState = state.map(inner => inner.slice())
-    if (playerTurn == 1) {
-        tempState[action.row][action.col] = 'X'
-    }
-    if (playerTurn == -1) {
-        tempState[action.row][action.col] = 'O'
-    }
-    return tempState
-}
-
-function c4CheckTerminal(state, playerTurn, previousStates) {
-    // Search rows
-    for (let i = 0; i < 6; i++) {
-        let count = 0
-        let curSymbol = '-'
-        for (let j = 0; j < 7; j++) {
-
-            if (state[i][j] == 'X') {
-                if (curSymbol == 'X') {
-                    count += 1
-                    if (count == 4) {
-                        return true
-                    }
-                }
-                else {
-                    curSymbol = 'X'
-                    count = 1
-                }
-            }
-            else if (state[i][j] == 'O') {
-                if (curSymbol == 'O') {
-                    count += 1
-                    if (count == 4) {
-                        return true
-                    }
-                }
-                else {
-                    curSymbol = 'O'
-                    count = 1
-                }
-            }
-            else {
-                count = 0
-                curSymbol = '-'
-            }
-
-        }
-    }
-
-
-    // Search columns
-    for (let j = 0; j < 7; j++) {
-        let count = 0
-        let curSymbol = '-'
-        for (let i = 0; i < 6; i++) {
-            if (state[i][j] == 'X') {
-                if (curSymbol == 'X') {
-                    count += 1
-                    if (count == 4) {
-                        return true
-                    }
-                }
-                else {
-                    curSymbol = 'X'
-                    count = 1
-                }
-            }
-            else if (state[i][j] == 'O') {
-                if (curSymbol == 'O') {
-                    count += 1
-                    if (count == 4) {
-                        return true
-                    }
-                }
-                else {
-                    curSymbol = 'O'
-                    count = 1
-                }
-            }
-            else {
-                count = 0
-                curSymbol = '-'
-            }
-        }
-    }
-
-    // Search diagonal down-right
-    for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 4; j++) {
-            if ((state[i + 0][j + 0] == state[i + 1][j + 1]) && (state[i + 2][j + 2] == state[i + 3][j + 3]) && (state[i + 1][j + 1] == state[i + 3][j + 3])) {
-                if (state[i + 0][j + 0] != '-') {
-                    return true
-                }
-            }
-        }
-    }
-
-    // Search diagonal up-right
-    for (let i = 0; i < 3; i++) {
-        for (let j = 3; j < 7; j++) {
-            if ((state[i + 0][j - 0] == state[i + 1][j - 1]) && (state[i + 2][j - 2] == state[i + 3][j - 3]) && (state[i + 1][j - 1] == state[i + 3][j - 3])) {
-                if (state[i + 0][j - 0] != '-') {
-                    return true
-                }
-            }
-        }
-    }
-
-    // Check if full
-    let isFull = true
-    for (let i = 0; i < 6; i++) {
-        for (let j = 0; j < 7; j++) {
-            if (state[i][j] == '-') {
-                isFull = false
-                break
-            }
-        }
-
-        if (!isFull) {
-            break
-        }
-    }
-
-    if (isFull) {
-        return true
-    }
-
-    return false
-}
-
-function c4CheckGain(state, playerTurn, previousStates) {
-    // Search rows
-    for (let i = 0; i < 6; i++) {
-        let count = 0
-        let curSymbol = '-'
-        for (let j = 0; j < 7; j++) {
-
-            if (state[i][j] == 'X') {
-                if (curSymbol == 'X') {
-                    count += 1
-                    if (count == 4) {
-                        if (playerTurn == 1) {
-                            return 1
-                        }
-                        else {
-                            return 0
-                        }
-                    }
-                }
-                else {
-                    curSymbol = 'X'
-                    count = 1
-                }
-            }
-            else if (state[i][j] == 'O') {
-                if (curSymbol == 'O') {
-                    count += 1
-                    if (count == 4) {
-                        if (playerTurn == -1) {
-                            return 1
-                        }
-                        else {
-                            return 0
-                        }
-                    }
-                }
-                else {
-                    curSymbol = 'O'
-                    count = 1
-                }
-            }
-            else {
-                count = 0
-                curSymbol = '-'
-            }
-
-        }
-    }
-
-
-    // Search columns
-    for (let j = 0; j < 7; j++) {
-        let count = 0
-        let curSymbol = '-'
-        for (let i = 0; i < 6; i++) {
-            if (state[i][j] == 'X') {
-                if (curSymbol == 'X') {
-                    count += 1
-                    if (count == 4) {
-                        if (playerTurn == 1) {
-                            return 1
-                        }
-                        else {
-                            return 0
-                        }
-                    }
-                }
-                else {
-                    curSymbol = 'X'
-                    count = 1
-                }
-            }
-            else if (state[i][j] == 'O') {
-                if (curSymbol == 'O') {
-                    count += 1
-                    if (count == 4) {
-                        if (playerTurn == -1) {
-                            return 1
-                        }
-                        else {
-                            return 0
-                        }
-                    }
-                }
-                else {
-                    curSymbol = 'O'
-                    count = 1
-                }
-            }
-            else {
-                count = 0
-                curSymbol = '-'
-            }
-        }
-    }
-
-    // Search diagonal down-right
-    for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 4; j++) {
-            if ((state[i + 0][j + 0] == state[i + 1][j + 1]) && (state[i + 2][j + 2] == state[i + 3][j + 3]) && (state[i + 1][j + 1] == state[i + 3][j + 3])) {
-                if (state[i + 0][j + 0] != '-') {
-                    if ((playerTurn == 1) && (state[i + 0][j + 0] == 'X')) {
-                        return 1
-                    }
-                    else if ((playerTurn == -1) && (state[i + 0][j + 0] == 'O')) {
-                        return 1
-                    }
-                    else {
-                        return 0
-                    }
-                }
-            }
-        }
-    }
-
-    // Search diagonal up-right
-    for (let i = 0; i < 3; i++) {
-        for (let j = 3; j < 7; j++) {
-            if ((state[i + 0][j - 0] == state[i + 1][j - 1]) && (state[i + 2][j - 2] == state[i + 3][j - 3]) && (state[i + 1][j - 1] == state[i + 3][j - 3])) {
-                if (state[i + 0][j - 0] != '-') {
-                    if ((playerTurn == 1) && (state[i + 0][j - 0] == 'X')) {
-                        return 1
-                    }
-                    else if ((playerTurn == -1) && (state[i + 0][j - 0] == 'O')) {
-                        return 1
-                    }
-                    else {
-                        return 0
-                    }
-                }
-            }
-        }
-    }
-
-    // Check if full
-    let isFull = true
-    for (let i = 0; i < 6; i++) {
-        for (let j = 0; j < 7; j++) {
-            if (state[i][j] == '-') {
-                isFull = false
-                break
-            }
-        }
-
-        if (!isFull) {
-            break
-        }
-    }
-
-    if (isFull) {
-        return 0.5
-    }
-}
-
-function c4ChooseRandomAction(actions) {
+function chooseRandomAction(actions) {
     const randomIndex = Math.floor(Math.random() * actions.length)
     return actions[randomIndex]
 }
 
+module.exports = {mctsAlgorithm, chooseRandomAction}
 
-const initialState = [
-    ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', '-', '-', '-', '-', '-', '-']
-]
-// const initialState = [
-//     ['-', '-', 'X', 'O', '-', '-', 'X'],
-//     ['-', '-', 'O', 'O', '-', '-', 'X'],
-//     ['X', '-', 'O', 'X', '-', 'O', 'X'],
-//     ['O', '-', 'O', 'O', '-', 'O', 'O'],
-//     ['X', '-', 'X', 'X', 'O', 'O', 'X'],
-//     ['X', 'X', 'X', 'O', 'O', 'X', 'X']
-// ]
-
-const prompt = require("prompt-sync")({ sigint: true })
-
-
-let p1Win = 0
-let p2Win = 0
-let draw = 0
-
-for (let g = 0; g < 1000; g++) {
-
-    let currentState = initialState
-
-    while (true) {
-
-        // Player 1 - Random AI
-        // const choosenActionP1 = c4ChooseRandomAction(c4getPossibleActions(currentState))
-        const choosenActionP1 = mctsAlgorithm(currentState, 1, 1, c4getPossibleActions, c4GetNextState, false, c4CheckTerminal, c4CheckGain)
-
-        currentState = c4GetNextState(currentState, 1, choosenActionP1)
-
-        if (c4CheckTerminal(currentState)) {
-            // console.log('Player 1 end')
-            // c4PrintState(currentState)
-            if (c4CheckGain(currentState, 1) == 1) {
-                p1Win += 1
-            }
-            else if (c4CheckGain(currentState, 1) == 0) {
-                p2Win += 1
-            }
-            else {
-                draw += 1
-            }
-            break
-        }
-
-        // Player 2 - random AI
-        const choosenActionP2 = mctsAlgorithm(currentState, -1, 1, c4getPossibleActions, c4GetNextState, false, c4CheckTerminal, c4CheckGain)
-        currentState = c4GetNextState(currentState, -1, choosenActionP2)
-
-
-        if (c4CheckTerminal(currentState)) {
-            // console.log('Player 2 end')
-            // c4PrintState(currentState)
-            if (c4CheckGain(currentState, -1) == 1) {
-                p2Win += 1
-            }
-            else if (c4CheckGain(currentState, -1) == 0) {
-                p1Win += 1
-            }
-            else {
-                draw += 1
-            }
-            break
-        }
-    }
-}
-
-console.log(`${p1Win}  ${p2Win}  ${draw}`)
 
