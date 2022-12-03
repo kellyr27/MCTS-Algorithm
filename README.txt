@@ -8,3 +8,5 @@ For example running the following line in the command line:
 The output for this should be something like below:
 P1 wins: 69     P2 wins:  931   Draws:  0
 This simulated 1000 games between an MCTS with 1000 iterations against an MCTS with 100 iterations.
+
+Note: Number of games must be even as each AI plays an equal amount of games as 'X' and 'O'.

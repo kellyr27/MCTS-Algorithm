@@ -2,7 +2,9 @@
  * Monte Carlo Tree Search Algorithm
  * Author: Kelly Ristovsky
  * Date: Nov-22
- * Purpose: - This code is designed to be adaptable for any game.
+ * Purpose: - Implementation of the Monte Carlo Tree Search algorithm
+ *          - This code is designed to be adaptable for any game
+ *          - Function for selecting random action from set of actions (used for testing purposes)
  */
 
 /**

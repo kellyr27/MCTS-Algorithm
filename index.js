@@ -6,7 +6,7 @@
  *          - Currently set up for MTCS vs MTCS
  */
 
-const { mctsAlgorithm, chooseRandomAction } = require('./mcts');
+const { mctsAlgorithm, chooseRandomAction } = require('./mcts')
 const { c4PrintState, c4getPossibleActions, c4GetNextState, c4CheckTerminal, c4CheckGain } = require('./connect4');
 
 /**
