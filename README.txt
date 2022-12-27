@@ -1,4 +1,11 @@
-You must have NodeJS installed. No package dependencies are required to run this project
+# Monte Carlo Tree Search Implementation
+
+## Project Description
+Implementation of the Monte Carlo Tree Search (MCTS) algorithm through deterministic game Connect Four. The algorithm implemented is independent of the game, so it can be implemented with any two player, deterministic game. Implemented in NodeJS. 
+
+Originally implemented for Major Project for COMP4121 Advanced Algorithms (UNSW, Australia).
+
+## Run Project
 
 Format to run this project in the command line in the file directory:
 > node index.js {Number of games simulated} {Number of iterations for MCTS AI 1} {Number of iterations for MCTS AI 2}
