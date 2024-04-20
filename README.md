@@ -1,25 +1,25 @@
 # Monte Carlo Tree Search Implementation
 
 ## Project Description
-Implementation of the Monte Carlo Tree Search (MCTS) algorithm through deterministic game Connect Four. The algorithm implemented is independent of the game, so it can be implemented with any two player, deterministic game. Implemented in NodeJS. 
+This project implements the Monte Carlo Tree Search (MCTS) algorithm for the deterministic game Connect Four. Notably, the algorithm's versatility enables its application to any two-player deterministic game. The implementation is written in Node.js.
 
-Originally implemented for Major Project for COMP4121 Advanced Algorithms (UNSW, Australia).
+Originally developed as a Major Project for COMP4121 Advanced Algorithms at UNSW, Australia.
 
 ## Run Project
 
-Format to run this project in the command line in the file directory:
+To run this project from the command line in the project directory, use the following format:
 ```console
 node index.js {Number of games simulated} {Number of iterations for MCTS AI 1} {Number of iterations for MCTS AI 2}
 ```
 
-For example running the following line in the command line:
+For example, running the following command:
 ```console
 node index.js 1000 10 100
 ```
-The output for this should be something like below (not exact figures as output is probabilistic):
+would produce output similar to the following (actual figures may vary due to probabilistic nature):
 ```console
 P1 wins: 69     P2 wins:  931   Draws:  0
 ```
-This simulated 1000 games between an MCTS with 1000 iterations against an MCTS with 100 iterations.
+This simulates 1000 games between an MCTS AI with 10 iterations and an MCTS AI with 100 iterations.
 
-Note: Number of games must be even as each AI plays an equal amount of games as 'X' and 'O'.
+Note: The number of games must be even, as each AI plays an equal number of games as 'X' and 'O'.
